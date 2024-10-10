@@ -16,4 +16,10 @@ public class ScSloom : MonoBehaviour{
     {
         
     }
+
+    public void Drop() {
+        if (true) { 
+            IsDraggable = false;
+        }
+    }
 }
