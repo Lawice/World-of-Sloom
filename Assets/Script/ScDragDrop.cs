@@ -2,15 +2,25 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class ScDragDrop : MonoBehaviour {
-    public enum State { Drag, Drop, Press, None}
-    public State TouchState = State.None;
+    public static ScDragDrop Instance;
 
-    [SerializeField] GameObject _selectedSloom;
+    public TOUCHSTATE TouchState = TOUCHSTATE.None;
+
+    public GameObject SelectedSloom;
     [SerializeField] LayerMask _groundLayer;
 
     Vector2 _touchPos;
     Vector2 _oldTouchPos;
     Camera _mainCamera;
+
+    private void Awake() {
+        if (Instance == null) {
+            Instance = this;
+        }
+        else {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start() {
         _mainCamera = Camera.main;
@@ -20,32 +30,32 @@ public class ScDragDrop : MonoBehaviour {
         return _mainCamera.ScreenToWorldPoint(postion);
     }
     public void Touch(InputAction.CallbackContext ctx) {
-        if (ctx.started) {
-            
-        }
         if (ctx.performed){
-            TouchState = State.Press;
+            if(TouchState != TOUCHSTATE.Drag) { 
+                TouchState = TOUCHSTATE.Press; 
+            }
+
             GrabSloom();
         }
         if (ctx.canceled) {
-            TouchState = State.None;
-            if(_selectedSloom && _selectedSloom.TryGetComponent(out Rigidbody2D sloomBody)) {
+            TouchState = TOUCHSTATE.None;
+            if(SelectedSloom && SelectedSloom.TryGetComponent(out Rigidbody2D sloomBody)) {
                 sloomBody.simulated = true;
-                if(_selectedSloom.TryGetComponent(out ScSloom sloomComponent)){
+                if(SelectedSloom.TryGetComponent(out ScSloom sloomComponent)){
                     sloomComponent.Drop();
                 }
             }
-            _selectedSloom = null;
+            SelectedSloom = null;
         }
     }
 
     public void Move(InputAction.CallbackContext ctx) {
         _touchPos = ctx.ReadValue<Vector2>();
         switch (TouchState) {
-            case State.Press :
+            case TOUCHSTATE.Press :
                 GrabSloom();
             break;
-            case State.Drag :
+            case TOUCHSTATE.Drag :
                 DragSloom();
                 break;
             
@@ -58,26 +68,26 @@ public class ScDragDrop : MonoBehaviour {
         if (!hit.collider){
             return;
         }
-        if (hit.collider.gameObject.TryGetComponent(out ScSloom sloomComponent) && sloomComponent.IsDraggable){
-            TouchState = State.Drag;
-            _selectedSloom = hit.collider.gameObject;
+        if (hit.collider.gameObject.TryGetComponent(out ScSloom sloomComponent) && sloomComponent.SloomState == SLOOMSTATE.Movable){
+            TouchState = TOUCHSTATE.Drag;
+            SelectedSloom = hit.collider.gameObject;
         }
     }
 
-    void DragSloom() {
+    public void DragSloom() {
         float rayRayon = 0.37f;
-        _selectedSloom.GetComponent<Rigidbody2D>().simulated = false;
+        SelectedSloom.GetComponent<Rigidbody2D>().simulated = false;
         Vector2 targetPos = WorldPos(_touchPos);
-        Vector2 sloomPos = _selectedSloom.transform.position;
+        Vector2 sloomPos = SelectedSloom.transform.position;
 
         if (Physics2D.OverlapCircle(targetPos, rayRayon, _groundLayer)){
             RaycastHit2D hitY = Physics2D.Raycast(new Vector2(targetPos.x, targetPos.y + 3f), Vector2.down, Mathf.Infinity, _groundLayer);
             if (hitY.collider != null) {
-                _selectedSloom.transform.position = Vector2.MoveTowards(_selectedSloom.transform.position, new Vector2(targetPos.x, hitY.point.y+ rayRayon), 15f);
+                SelectedSloom.transform.position = Vector2.MoveTowards(SelectedSloom.transform.position, new Vector2(targetPos.x, hitY.point.y+ rayRayon), 15f);
             }
         }
         else {
-            _selectedSloom.transform.position = Vector2.MoveTowards(_selectedSloom.transform.position, targetPos, 15f);
+            SelectedSloom.transform.position = Vector2.MoveTowards(SelectedSloom.transform.position, targetPos, 15f);
         }
     }
 }
