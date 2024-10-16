@@ -106,8 +106,9 @@ MonoBehaviour:
     m_Bits: 64
   _SloomJointFrequency: 1.5
   _linePrefab: {fileID: 8655786898962462424, guid: 27169c3f37cb5824e83e8417b16fbd69, type: 3}
+  LinesFolder: {fileID: 8519458913086398913, guid: a573ed76b4264ed4485cda6ff81742d0, type: 3}
   NeighborSlooms: []
-  LinesList: []
+  Lines: []
 --- !u!58 &1829347886467088318
 CircleCollider2D:
   m_ObjectHideFlags: 0

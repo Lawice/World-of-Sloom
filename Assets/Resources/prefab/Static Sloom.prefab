@@ -107,10 +107,10 @@ MonoBehaviour:
   _SloomLayer:
     serializedVersion: 2
     m_Bits: 64
-  _SloomJointFrequency: 1.5
-  _lineObject: {fileID: 8655786898962462424, guid: 27169c3f37cb5824e83e8417b16fbd69, type: 3}
+  _SloomJointFrequency: 7.62
+  _linePrefab: {fileID: 8655786898962462424, guid: 27169c3f37cb5824e83e8417b16fbd69, type: 3}
   NeighborSlooms: []
-  LinesList: []
+  Lines: []
 --- !u!58 &6772453314712142049
 CircleCollider2D:
   m_ObjectHideFlags: 0

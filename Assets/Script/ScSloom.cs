@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -11,7 +13,8 @@ public class ScSloom : MonoBehaviour{
 
     [SerializeField] GameObject _linePrefab;
     public List<GameObject> NeighborSlooms = new List<GameObject>();
-    public List<Line> LinesList = new List<Line>();
+    public List<Line> Lines = new List<Line>();
+
 
 
     private void Update() {
@@ -52,47 +55,94 @@ public class ScSloom : MonoBehaviour{
     }
 
     void AddLines() {
-        if (SloomState == SLOOMSTATE.Movable) {
-            Collider2D[] ClosestSlooms = Physics2D.OverlapCircleAll(transform.position, _detectionRadius, _SloomLayer);
-            foreach (Collider2D sloomCollider in ClosestSlooms) {
-                GameObject newSloom = sloomCollider.gameObject;
-                if (newSloom != gameObject && newSloom.TryGetComponent(out ScSloom newSloomComp) && (newSloomComp.SloomState == SLOOMSTATE.Static || newSloomComp.SloomState == SLOOMSTATE.Placed)) {
-                    AddLine(gameObject, newSloom);
-                }
-            }
-            foreach (Line oldLine in LinesList) {
-                bool IsLinked = false;
-                foreach (Collider2D collider in ClosestSlooms) {
-                    
-                    if(collider.transform == oldLine.destination) {
-                        IsLinked = true; break;
+        switch (SloomState) {
+            case SLOOMSTATE.Static:
+            case SLOOMSTATE.Placed:
+                foreach (GameObject closeSloom in NeighborSlooms) {
+                    ScSloom closeSloomComp = closeSloom.GetComponent<ScSloom>();
+                    bool isLineDrawed = false;
+                    foreach(Line closeSloomLine in closeSloomComp.Lines) {
+                        if(closeSloomLine.destination == transform) {
+                            isLineDrawed =true; break;
+                        }
+                    }
+
+                    if (!isLineDrawed) {
+                        AddLine(gameObject, closeSloom);
                     }
                 }
+                foreach (Line oldLine in Lines.ToList()) {
+                    bool isLinked = false;
+                    foreach (GameObject closeSloom in NeighborSlooms) {
+                        if (closeSloom.transform == oldLine.destination) {
+                            isLinked = true;
+                            break;
+                        }
+                    }
 
-                if (!IsLinked) {
-                    oldLine.line.SetActive(false);
+                    if (!isLinked) {
+                        Destroy(oldLine.line);
+                        Lines.Remove(oldLine);
+                    }
                 }
-            }
+            break;
+            case SLOOMSTATE.Movable:
+                Collider2D[] ClosestSlooms = Physics2D.OverlapCircleAll(transform.position, _detectionRadius, _SloomLayer);
+                foreach (Collider2D sloomCollider in ClosestSlooms) {
+                    GameObject newSloom = sloomCollider.gameObject;
+                    if (newSloom != gameObject && newSloom.TryGetComponent(out ScSloom newSloomComp) && (newSloomComp.SloomState == SLOOMSTATE.Static || newSloomComp.SloomState == SLOOMSTATE.Placed)) {
+                        AddLine(gameObject, newSloom, true);
+                    }
+                }
+                foreach (Line oldLine in Lines) {
+                    bool isLinked = false;
+                    foreach (Collider2D collider in ClosestSlooms) {
+                        if (collider.transform == oldLine.destination) {
+                            isLinked = true; break;
+                        }
+                    }
+
+                    if (!isLinked) {
+                        oldLine.line.SetActive(false);
+                    } 
+                }
+            break;
+
         }
-        else { 
-            
-        }
+
     }
 
-    void AddLine(GameObject gameObject1, GameObject gameObject2) {
+    void AddLine(GameObject gameObject1, GameObject gameObject2, bool isTransparent = false) {
         if(!IsSloomInList(gameObject2.transform)) {
-            GameObject newLineObject = Instantiate(_linePrefab);
+            GameObject newLineObject = Instantiate(_linePrefab,transform.parent);
 
             newLineObject = PlaceLine(newLineObject, gameObject1.transform.position, gameObject2.transform.position);
 
+            if (isTransparent) {
+                SpriteRenderer spriteRenderer = newLineObject.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null) {
+                    Color color = spriteRenderer.color;
+                    color.a = 0.5f;
+                    spriteRenderer.color = color;
+                }
+            }
+
             Line newLine = new Line { destination = gameObject2.transform, line = newLineObject};
-            LinesList.Add(newLine);
+            Lines.Add(newLine);
         }
         else {
             GameObject line = GetSloomInList(gameObject2.transform);
             line.SetActive(true);
 
             line = PlaceLine(line, gameObject1.transform.position, gameObject2.transform.position);
+            if (!isTransparent) {
+                SpriteRenderer spriteRenderer = line.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null) {
+                    Color color = spriteRenderer.color;
+                    color.a = 1f;
+                    spriteRenderer.color = color;
+                }
+            }
         }
     }
 
@@ -110,14 +160,14 @@ public class ScSloom : MonoBehaviour{
     }
    
     bool IsSloomInList(Transform target) {
-        foreach (Line line in LinesList) { 
+        foreach (Line line in Lines) { 
             if(line.destination == target) return true;
         }
         return false;
     }
 
     GameObject GetSloomInList(Transform target) {
-        foreach (Line line in LinesList) {
+        foreach (Line line in Lines) {
             if (line.destination == target) return line.line;
         }
         return null;

@@ -58,7 +58,8 @@ public class ScDragDrop : MonoBehaviour {
             case TOUCHSTATE.Drag :
                 DragSloom();
                 break;
-            
+            default:
+            return;
         }
     }
 
@@ -81,7 +82,7 @@ public class ScDragDrop : MonoBehaviour {
         Vector2 sloomPos = SelectedSloom.transform.position;
 
         if (Physics2D.OverlapCircle(targetPos, rayRayon, _groundLayer)){
-            RaycastHit2D hitY = Physics2D.Raycast(new Vector2(targetPos.x, targetPos.y + 3f), Vector2.down, Mathf.Infinity, _groundLayer);
+            RaycastHit2D hitY = Physics2D.Raycast(new Vector2(targetPos.x, targetPos.y + rayRayon), Vector2.down, Mathf.Infinity, _groundLayer);
             if (hitY.collider != null) {
                 SelectedSloom.transform.position = Vector2.MoveTowards(SelectedSloom.transform.position, new Vector2(targetPos.x, hitY.point.y+ rayRayon), 15f);
             }
