@@ -99,11 +99,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7788939669369482247}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 626d9fd09bc49064db9fe0dc5777d390, type: 3}
+  m_Script: {fileID: 11500000, guid: d2e783e63bb574f44ad53e5b94f781cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SloomState: 0
-  _detectionRadius: 3
+  _detectionRadius: 0
   _SloomLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -212,7 +212,7 @@ SpringJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 1
-  m_Distance: 3.5927982
+  m_Distance: 15.764025
   m_DampingRatio: 0
   m_Frequency: 15
 --- !u!231 &8356016875804808304
@@ -233,6 +233,6 @@ SpringJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 1
-  m_Distance: 2.5100799
+  m_Distance: 15.764025
   m_DampingRatio: 0
   m_Frequency: 15

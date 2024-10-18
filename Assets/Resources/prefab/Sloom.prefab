@@ -96,17 +96,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 5270996843413413575}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 626d9fd09bc49064db9fe0dc5777d390, type: 3}
+  m_Script: {fileID: 11500000, guid: d2e783e63bb574f44ad53e5b94f781cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SloomState: 1
-  _detectionRadius: 3
+  _detectionRadius: 2.5
   _SloomLayer:
     serializedVersion: 2
     m_Bits: 64
   _SloomJointFrequency: 1.5
   _linePrefab: {fileID: 8655786898962462424, guid: 27169c3f37cb5824e83e8417b16fbd69, type: 3}
-  LinesFolder: {fileID: 8519458913086398913, guid: a573ed76b4264ed4485cda6ff81742d0, type: 3}
   NeighborSlooms: []
   Lines: []
 --- !u!58 &1829347886467088318
